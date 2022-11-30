@@ -9,29 +9,24 @@ def my_monitor(app):
         state.event(event)
         task = state.tasks.get(event['uuid'])
 
-        #if task.name == 'celeryproj.train_model':
-            #print('TASK RECEIVED: %s[%s] %s Log info stored in DB.' % (
-                #task.name, task.uuid, task.info(),))
-            #report.insert_log(task.uuid, task.name, task.state, task, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        print('TASK RECEIVED: %s[%s] %s Log info stored in DB.' % (
+            task.name, task.uuid, task.info(),))
+        report.insert_log(task.uuid, task.name, task.state, task, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     def announce_failed_tasks(event):
         state.event(event)
-        # task name is sent only with -received event, and state
-        # will keep track of this for us.
         task = state.tasks.get(event['uuid'])
 
-        if task.name == 'celeryproj.train_model':
-            print('TASK FAILED: %s[%s] %s Log info stored in DB.' % (
-                task.name, task.uuid, task.info(),))
-            report.insert_log(task.uuid, task.name, task.state, task, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        print('TASK FAILED: %s[%s] %s Log info stored in DB.' % (
+            task.name, task.uuid, task.info(),))
+        report.insert_log(task.uuid, task.name, task.state, task, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     def announce_succeeded_tasks(event):
         state.event(event)
         task = state.tasks.get(event['uuid'])
 
-        if task.name == 'celeryproj.train_model':
-            print('TASK SUCCESS: %s[%s] %s Log info stored in DB.' % (
-                task.name, task.uuid, task.info(),))
-            report.insert_log(task.uuid, task.name, task.state, task, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        print('TASK SUCCESS: %s[%s] %s Log info stored in DB.' % (
+            task.name, task.uuid, task.info(),))
+        report.insert_log(task.uuid, task.name, task.state, task, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     def worker_online_handler(event):
         state.event(event)
