@@ -1,7 +1,9 @@
 from celery import Celery
 import datetime
-import report
+import celery_log
 
+# Monitors events coming from the celery trainer task queue.
+# Logs the tasks results with a separate celery queue (same Redis).
 def my_monitor(app):
     state = app.events.State()
 
@@ -20,10 +22,10 @@ def my_monitor(app):
         # will keep track of this for us.
         task = state.tasks.get(event['uuid'])
 
-        if task.name == 'celeryproj.train_model':
-            print('TASK FAILED: %s[%s] %s Log info stored in DB.' % (
-                task.name, task.uuid, task.info(),))
-            report.insert_log(task.uuid, task.name, task.state, task, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        print('TASK FAILED: %s[%s] %s Log info stored in DB.' % (
+           task.name, task.uuid, task.info(),))
+        celery_log.insert_log.delay(task.uuid, task.name, task.state, task, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
     def announce_succeeded_tasks(event):
         state.event(event)
         task = state.tasks.get(event['uuid'])
@@ -31,7 +33,7 @@ def my_monitor(app):
         if task.name == 'celeryproj.train_model':
             print('TASK SUCCESS: %s[%s] %s Log info stored in DB.' % (
                 task.name, task.uuid, task.info(),))
-            report.insert_log(task.uuid, task.name, task.state, task, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            celery_log.insert_log.delay(task.uuid, task.name, task.state, task, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     def worker_online_handler(event):
         state.event(event)
