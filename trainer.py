@@ -1,4 +1,3 @@
-import json
 import time
 
 # simulates training the model here
